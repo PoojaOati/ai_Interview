@@ -24,12 +24,14 @@ const Auth = () => {
     try {
       if (isLogin) {
         await signInWithEmailAndPassword(auth, email, password);
+         const hasSeenAbout = localStorage.getItem('hasSeenAbout') === 'true';
+         navigate(hasSeenAbout ? '/home' : '/about');
       } else {
         await createUserWithEmailAndPassword(auth, email, password);
+        navigate('/login');
       }
 
-      const hasSeenAbout = localStorage.getItem('hasSeenAbout') === 'true';
-      navigate(hasSeenAbout ? '/home' : '/about');
+     
     } catch (error) {
       console.error('Authentication error:', error);
       alert('Authentication failed. Please try again.');

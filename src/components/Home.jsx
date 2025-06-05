@@ -1,14 +1,16 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef} from 'react';
 import {
   Box,
   Button,
   CircularProgress,
   Container,
   TextField,
+  FormControl,
   Typography,
   AppBar,
   Toolbar,
   IconButton,
+  InputLabel,MenuItem, Select,
   Stack,
   useMediaQuery,
   useTheme,
@@ -24,8 +26,8 @@ import { useNavigate } from 'react-router-dom';
 const Home = () => {
   const navigate = useNavigate();
   const [showForm, setShowForm] = useState(false);
-  const [skills, setSkills] = useState('');
-  const [experience, setExperience] = useState('');
+  const [skills, setSkills] = useState('SQL');
+  const [experience, setExperience] = useState(1);
   const [loading, setLoading] = useState(false);
   const [questions, setQuestions] = useState([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -43,27 +45,36 @@ const Home = () => {
 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const formRef = useRef(null);
 
-  useEffect(() => {
-    const introText =
-      "Let's start with the interview. Press the Add button to submit your skills and years of experience.";
-    const utterance = new SpeechSynthesisUtterance(introText);
-    utterance.rate = 1;
-    utterance.pitch = 1;
+ useEffect(() => {
+  const introText =
+    "Let's start with the interview. Press the Add button to submit your skills and years of experience.";
+  const utterance = new SpeechSynthesisUtterance(introText);
+  utterance.rate = 1;
+  utterance.pitch = 1;
 
-    setIsSpeaking(true);
-    utterance.onend = () => {
-      setIsSpeaking(false);
-      setShowForm(true);
-    };
+  setIsSpeaking(true);
+  utterance.onend = () => {
+    setIsSpeaking(false);
+    setShowForm(true);
 
-    speechSynthesis.speak(utterance);
+    // 🔁 Scroll after rendering the form
+    setTimeout(() => {
+      if (formRef.current) {
+        formRef.current.scrollIntoView({ behavior: 'smooth' });
+      }
+    }, 200); // small delay to let form mount
+  };
 
-    return () => {
-      speechSynthesis.cancel();
-      setIsSpeaking(false);
-    };
-  }, []);
+  speechSynthesis.speak(utterance);
+
+  return () => {
+    speechSynthesis.cancel();
+    setIsSpeaking(false);
+  };
+}, []);
+
 
   useEffect(() => {
     if (loading) {
@@ -75,7 +86,7 @@ const Home = () => {
   }, [loading, loadingMessages]);
 
   const handleStartInterview = async () => {
-    if (!skills.trim() || !experience.trim()) {
+    if (!skills.trim() || !experience) {
       alert('Please enter your skills and experience.');
       return;
     }
@@ -95,7 +106,7 @@ const Home = () => {
 
     loadingUtterance.onend = async () => {
       try {
-        const response = await axios.post('http://localhost:5000/generate-questions', {
+        const response = await axios.post('https://ai-interview-backend-90wp.onrender.com/generate-questions', {
           skills,
           experience,
         });
@@ -103,7 +114,7 @@ const Home = () => {
         const cleanedQuestions = response.data.questions || [];
 
         if (cleanedQuestions.length < 10) {
-          alert('Less than 10 questions received. Please check backend.');
+          alert('Less than 10 questions received. Please Retry Once.');
         }
 
         setQuestions(cleanedQuestions);
@@ -218,7 +229,7 @@ const Home = () => {
     const finalAnswers = [...answers, transcribedAnswer];
 
     try {
-      const response = await axios.post('http://localhost:5000/evaluate', {
+      const response = await axios.post('https://ai-interview-backend-90wp.onrender.com/evaluate', {
         skills,
         experience,
         questions,
@@ -316,7 +327,7 @@ const handleDownloadPDF = () => {
   addTextWithWrap('', feedbackNote);
 
   // Add clickable email link
-  const email = 'feedback@example.com';
+  const email = 'poojas632@gmail.com';
   const mailtoLink = `mailto:${email}`;
   pdf.setTextColor(0, 0, 255); // blue link color
   pdf.textWithLink(email, 20, y, { url: mailtoLink });
@@ -331,8 +342,8 @@ const handleDownloadPDF = () => {
 
 
   const handleStartNew = () => {
-    setSkills('');
-    setExperience('');
+    setSkills('SQL');
+    setExperience(1);
     setQuestions([]);
     setAnswers([]);
     setCurrentQuestionIndex(0);
@@ -366,14 +377,66 @@ const handleDownloadPDF = () => {
 
       {!showForm && <Box sx={{ height: '20vh' }} />}
 
-      {showForm && !loading && questions.length === 0 && !evaluationResult && (
-        <Box sx={{ mt: 4 }}>
-          <TextField fullWidth label="Skills" value={skills} onChange={(e) => setSkills(e.target.value)} margin="normal" />
-          <TextField fullWidth label="Years of Experience" value={experience} onChange={(e) => setExperience(e.target.value)} margin="normal" />
-          <Button variant="contained" onClick={handleStartInterview}>Add</Button>
-        </Box>
-      )}
+      {showForm && !loading && questions.length === 0 && !evaluationResult &&
+      (
+<Box ref={formRef}
+  sx={{
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    mt: 4,
+  }}
+>
+  <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
+    <FormControl sx={{ minWidth: 140 }}>
+      <InputLabel id="skills-label">Skills</InputLabel>
+      <Select
+        labelId="skills-label"
+        value={skills}
+        label="Skills"
+        onChange={(e) => setSkills(e.target.value)}
+      >
+        <MenuItem value="JavaScript">JavaScript</MenuItem>
+        <MenuItem value="Python">Python</MenuItem>
+        <MenuItem value="Java">Java</MenuItem>
+        <MenuItem value="C#">C#</MenuItem>
+        <MenuItem value="SQL">SQL</MenuItem>
+        <MenuItem value="React">React</MenuItem>
+        <MenuItem value="Node.js">Node.js</MenuItem>
+        <MenuItem value="Machine Learning">Machine Learning</MenuItem>
+      </Select>
+    </FormControl>
 
+    <FormControl sx={{ minWidth: 140 }}>
+      <InputLabel id="experience-label">Experience</InputLabel>
+      <Select
+        labelId="experience-label"
+        value={experience}
+        label="Experience"
+        onChange={(e) => setExperience(e.target.value)}
+      >
+        <MenuItem value="1">1 Year</MenuItem>
+        <MenuItem value="2">2 Years</MenuItem>
+        <MenuItem value="3">3 Years</MenuItem>
+        <MenuItem value="4">4 Years</MenuItem>
+        <MenuItem value="5">5 Years</MenuItem>
+        <MenuItem value="6+">6+ Years</MenuItem>
+      </Select>
+    </FormControl>
+  </Box>
+
+  <Button
+    variant="contained"
+    size="medium"
+    sx={{ width: 120 }}
+    onClick={handleStartInterview}
+  >
+    Add
+  </Button>
+</Box>
+
+
+      )}
       {loading && (
         <Box sx={{ height: '50vh', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
           <CircularProgress />

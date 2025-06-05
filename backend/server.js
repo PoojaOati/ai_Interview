@@ -33,7 +33,7 @@ app.post('/generate-questions', async (req, res) => {
       headers: {
         'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
         'Content-Type': 'application/json',
-        'HTTP-Referer': 'http://localhost:3000',
+        'HTTP-Referer': 'https://ai-interview-frontend-dsu1.onrender.com/',
         'X-Title': 'AI Interview App'
       },
       body: JSON.stringify({
@@ -132,7 +132,7 @@ app.post('/evaluate', async (req, res) => {
         headers: {
           'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
           'Content-Type': 'application/json',
-          'HTTP-Referer': 'http://localhost:3000',
+          'HTTP-Referer': 'https://ai-interview-frontend-dsu1.onrender.com/',
           'X-Title': 'AI Interview Evaluation'
         },
         body: JSON.stringify({
