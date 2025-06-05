@@ -29,7 +29,7 @@ app.post('/generate-questions', async (req, res) => {
   const fetchQuestionsFromOpenRouter = async () => {
     const response = await fetch(OPENROUTER_API_URL, {
       method: 'POST',
-      agent: httpsAgent,
+    //  agent: httpsAgent,
       headers: {
         'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
         'Content-Type': 'application/json',
@@ -128,7 +128,7 @@ app.post('/evaluate', async (req, res) => {
     try {
       const response = await fetch(OPENROUTER_API_URL, {
         method: 'POST',
-        agent: httpsAgent,
+      //  agent: httpsAgent,
         headers: {
           'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
           'Content-Type': 'application/json',
