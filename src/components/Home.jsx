@@ -12,6 +12,8 @@ import {
   IconButton,
   InputLabel,MenuItem, Select,
   Stack,
+  Snackbar,
+  Alert,
   useMediaQuery,
   useTheme,
 } from '@mui/material';
@@ -42,14 +44,15 @@ const Home = () => {
   const evaluationRef = useRef();
   const [disabledText, setDisabledText] = useState(true);
   const [loadingMessages, setLoadingMessages] = useState([]);
-
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [noAnswer,setNoAnswer]  = useState(true);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const formRef = useRef(null);
 
  useEffect(() => {
   const introText =
-    "Let's start with the interview. Press the Add button to submit your skills and years of experience.";
+    "Let's start with the interview. Select your skills and years of experience and click submit to start.";
   const utterance = new SpeechSynthesisUtterance(introText);
   utterance.rate = 1;
   utterance.pitch = 1;
@@ -184,6 +187,10 @@ const Home = () => {
         setTranscribedAnswer((prev) => (prev + ' ' + finalTranscript).trim());
       }
     };
+    if(transcribedAnswer === '' || transcribedAnswer === undefined) {
+      setOpenSnackbar(true);
+      setNoAnswer(true);
+    }
 
     recognition.onerror = (e) => {
       console.error('Speech recognition error:', e.error);
@@ -207,12 +214,14 @@ const Home = () => {
     if (recognitionRef.current) {
       recognitionRef.current.stop();
     }
+    setNoAnswer(false);
   };
 
   const handleNextQuestion = () => {
     setAnswers((prev) => [...prev, transcribedAnswer]);
     setTranscribedAnswer('');
     setDisabledText(true);
+    setNoAnswer(true);
 
     if (currentQuestionIndex < questions.length - 1) {
       const nextIndex = currentQuestionIndex + 1;
@@ -337,9 +346,9 @@ const handleDownloadPDF = () => {
   pdf.save('interview_evaluation.pdf');
 };
 
-
-
-
+const feedbackClicked = () => {
+  navigate('/feedback');
+};
 
   const handleStartNew = () => {
     setSkills('SQL');
@@ -431,7 +440,7 @@ const handleDownloadPDF = () => {
     sx={{ width: 120 }}
     onClick={handleStartInterview}
   >
-    Add
+    Let's Start
   </Button>
 </Box>
 
@@ -469,12 +478,11 @@ const handleDownloadPDF = () => {
               Stop & Submit Answer
             </Button>
           )}
-
           <Button
             variant="outlined"
             sx={{ mt: 2, ml: 2 }}
             onClick={handleNextQuestion}
-            disabled={isSpeaking || currentQuestionIndex >= questions.length - 1}
+            disabled={noAnswer}
           >
             Next Question
           </Button>
@@ -499,6 +507,9 @@ const handleDownloadPDF = () => {
           </Button>
           <Button variant="outlined" color="primary" onClick={handleStartNew} sx={{ mt: 3 }}>
             Start New Interview
+          </Button>
+          <Button variant="outlined" color="primary" onClick={feedbackClicked} sx={{ mt: 3 }}>
+           Like us?
           </Button>
         </Box>
       )}

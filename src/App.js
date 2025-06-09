@@ -5,6 +5,7 @@ import About from './components/About';
 import { auth } from './firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 import { useEffect, useState } from 'react';
+import FeedbackForm from './components/FeedbackForm';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -22,6 +23,7 @@ function App() {
        <Route path="/login" element={<Auth />} />
        <Route path="/about" element={<About />} />
         <Route path="/home" element={<Home />} />
+        <Route path="/feedback" element={<FeedbackForm />} />
         <Route path="/" element={user ? <Home /> : <Auth />} />
       </Routes>
     </Router>

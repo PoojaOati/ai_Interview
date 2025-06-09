@@ -7,9 +7,18 @@ require('dotenv').config();
 
 const app = express();
 const port = 5000;
+const admin = require('firebase-admin');
+const firebaseAdminKey = process.env.FIREBASE_ADMIN_Key;
+
+const firebaseConfig = JSON.parse(
+  Buffer.from(firebaseAdminKey, 'base64').toString('utf8')
+);
 
 app.use(cors());
 app.use(bodyParser.json());
+admin.initializeApp({
+  credential: admin.credential.cert(firebaseConfig)
+});
 
 // Proxy configuration
 const proxyUrl = process.env.HTTP_PROXY || 'http://proxy-chain.intel.com:911';
@@ -25,6 +34,16 @@ app.post('/generate-questions', async (req, res) => {
 
   const generatePrompt = () =>
     `Generate exactly 10 interview questions (numbered 1 to 10) for a candidate with the following skill(s): ${skills}, and ${experience} years of experience. Only return the 10 questions as a numbered list, with no explanations or commentary.`;
+
+  app.post('/verify-user', async (req, res) => {
+  const { uid } = req.body;
+  try {
+    await admin.auth().updateUser(uid, { emailVerified: true });
+    return res.json({ success: true, message: 'User verified' });
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
+});
 
   const fetchQuestionsFromOpenRouter = async () => {
     const response = await fetch(OPENROUTER_API_URL, {
@@ -99,7 +118,7 @@ function FormatEvaluation(rawText) {
     }
   
     // Extract Weaknesses
-    const weaknessesMatch = rawText.match(/Weaknesses\s*:\s*(.*?)Overall Score\s*:/s);
+   const weaknessesMatch = rawText.match(/Weaknesses\s*:\s*([\s\S]*?)(?=Overall Score\s*:)/);
     if (weaknessesMatch) {
       const weaknesses = weaknessesMatch[1].trim().split(/[\n•\-]+/).filter(w => w.trim() !== '');
       result.weaknesses = weaknesses.map(w => w.trim());
