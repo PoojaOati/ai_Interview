@@ -21,7 +21,7 @@ admin.initializeApp({
 });
 
 // Proxy configuration
-const proxyUrl = process.env.HTTP_PROXY || 'http://proxy-chain.intel.com:911';
+const proxyUrl = process.env.HTTP_PROXY ;
 const httpsAgent = new HttpsProxyAgent(proxyUrl);
 
 // OpenRouter API settings

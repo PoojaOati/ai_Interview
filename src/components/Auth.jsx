@@ -50,6 +50,17 @@ const handleRegister = async () => {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
 
+    // ✅ STEP 1: Validate email using Abstract API
+    const res = await fetch(
+      `https://emailvalidation.abstractapi.com/v1/?api_key=${process.env.REACT_APP_ABSTRACT_API_KEY}&email=${email}`
+    );
+    const data = await res.json();
+
+    if (!data.deliverability || data.deliverability !== 'DELIVERABLE') {
+      enqueueSnackbar('Invalid or fake email. Please enter a valid email address.', { variant: 'warning' });
+      return;
+    }
+    
     // 🔧 Send verification email using EmailJS
     await emailjs.send(
       process.env.REACT_APP_EMAILJS_SERVICE_ID,
@@ -61,7 +72,7 @@ const handleRegister = async () => {
       process.env.REACT_APP_EMAILJS_PUBLIC_KEY
     );
 
-    enqueueSnackbar('Verification email sent via EmailJS. Please check your inbox.', { variant: 'info' });
+    enqueueSnackbar('Verification email sent. Please check your inbox.', { variant: 'info' });
     navigate('/login');
   } catch (error) {
     console.error('Registration error:', error);

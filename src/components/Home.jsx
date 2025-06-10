@@ -90,7 +90,8 @@ const Home = () => {
 
   const handleStartInterview = async () => {
     if (!skills.trim() || !experience) {
-      alert('Please enter your skills and experience.');
+       enqueueSnackbar('Please select your skills and experience.', { variant: 'warning' });
+     // alert('Please enter your skills and experience.');
       return;
     }
 
@@ -117,7 +118,8 @@ const Home = () => {
         const cleanedQuestions = response.data.questions || [];
 
         if (cleanedQuestions.length < 10) {
-          alert('Less than 10 questions received. Please Retry Once.');
+           enqueueSnackbar('Less than 10 questions received. Please Retry Once..', { variant: 'info' });
+          //alert('Less than 10 questions received. Please Retry Once.');
         }
 
         setQuestions(cleanedQuestions);
@@ -167,7 +169,8 @@ const Home = () => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
     if (!SpeechRecognition) {
-      alert('Speech recognition not supported in this browser.');
+      enqueueSnackbar('Speech recognition not supported in this browser.', { variant: 'warning' });
+      //alert('Speech recognition not supported in this browser.');
       return;
     }
 
@@ -247,7 +250,8 @@ const Home = () => {
       setEvaluationResult(response.data);
     } catch (error) {
       console.error('Error during evaluation:', error);
-      alert('Evaluation failed.');
+      enqueueSnackbar('Evaluation failed.', { variant: 'error' });
+      //alert('Evaluation failed.');
     }
 
     setLoading(false);
