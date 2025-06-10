@@ -24,6 +24,9 @@ import jsPDF from 'jspdf';
 import { auth } from '../firebase';
 import { signOut } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
+import { useSnackbar } from 'notistack';
+import emailjs from '@emailjs/browser'; // 🔧 Import EmailJS
+
 
 const Home = () => {
   const navigate = useNavigate();
@@ -49,6 +52,7 @@ const Home = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const formRef = useRef(null);
+  const { enqueueSnackbar } = useSnackbar();
 
  useEffect(() => {
   const introText =
