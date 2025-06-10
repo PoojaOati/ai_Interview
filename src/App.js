@@ -11,6 +11,7 @@ function App() {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
+    document.title = "AI Interview";
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
     });
