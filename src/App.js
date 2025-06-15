@@ -6,6 +6,8 @@ import { auth } from './firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 import { useEffect, useState } from 'react';
 import FeedbackForm from './components/FeedbackForm';
+import VerifyEmailReminder from './components/VerifyEmailReminder';
+import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -22,10 +24,11 @@ function App() {
     <Router>
       <Routes>
        <Route path="/login" element={<Auth />} />
-       <Route path="/about" element={<About />} />
-        <Route path="/home" element={<Home />} />
+       <Route path="/about" element={<ProtectedRoute><About /></ProtectedRoute>} />
+      <Route path="/home" element={<ProtectedRoute><Home /></ProtectedRoute>} />
+      <Route path="/verify-email" element={<VerifyEmailReminder />} />
         <Route path="/feedback" element={<FeedbackForm />} />
-        <Route path="/" element={user ? <Home /> : <Auth />} />
+        <Route path="*" element={user ? <Home /> : <Auth />} />
       </Routes>
     </Router>
   );
