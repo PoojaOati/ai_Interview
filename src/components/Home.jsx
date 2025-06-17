@@ -369,6 +369,9 @@ const feedbackClicked = () => {
     setEvaluationResult(null);
     setShowForm(true);
   };
+  const handleBlockEvent = (e) => {
+    e.preventDefault();
+  };
 
   const logout = () => {
     signOut(auth);
@@ -473,6 +476,10 @@ const feedbackClicked = () => {
             disabled={disabledText}
             label="Your Answer"
             value={transcribedAnswer}
+            onCopy={handleBlockEvent}
+            onPaste={handleBlockEvent}
+            onCut={handleBlockEvent}
+            onContextMenu={handleBlockEvent}
             onChange={(e) => setTranscribedAnswer(e.target.value)}
             sx={{ mt: 3 }}
           />

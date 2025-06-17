@@ -13,11 +13,29 @@ function App() {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
+    const disableContextMenu = (e) => e.preventDefault();
+
+    const disableDevTools = (e) => {
+      if (
+        e.key === 'F12' || // F12
+        (e.ctrlKey && e.shiftKey && ['I', 'J', 'C'].includes(e.key)) || // Ctrl+Shift+I/J/C
+        (e.ctrlKey && e.key === 'U') // Ctrl+U
+      ) {
+        e.preventDefault();
+      }
+    };
+
+    document.addEventListener('contextmenu', disableContextMenu);
+    document.addEventListener('keydown', disableDevTools);
+
     document.title = "AI Interview";
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
     });
-    return () => unsubscribe();
+    return () =>{ unsubscribe()
+      document.removeEventListener('contextmenu', disableContextMenu);
+      document.removeEventListener('keydown', disableDevTools);
+    };
   }, []);
 
   return (
